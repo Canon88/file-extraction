@@ -78,3 +78,7 @@ Uses file_state_remove to rename extracted files based on the sha1 checksum when
 ### store-files-by-sha256.zeek
 
 Uses file_state_remove to rename extracted files based on the sha256 checksum whenever it is available.
+
+### filter-demo.zeek
+
+新增过滤插件，针对指定hostname,uri,method进行过滤后再进行文件还原。
