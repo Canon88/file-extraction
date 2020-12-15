@@ -12,8 +12,10 @@ export {
     ## Hook to exclude files from extraction
     global ignore: hook(f: fa_file, meta: fa_metadata);
     
-    ## Hook to include http host from extraction
+    ## Hook to include http host from extraction by Canon
     global http: hook(hostname: string, method: string, url: string);
+    ## Hook to exclude http host from extraction by Canon
+    global http_ignore: hook(hostname: string, method: string, url: string);
 }
 
 event file_sniff(f: fa_file, meta: fa_metadata)
@@ -25,14 +27,16 @@ event file_sniff(f: fa_file, meta: fa_metadata)
 
         if ( f$source == "HTTP" )
             {
-
             if ( (!f$http?$host) || (!f$http?$method) || (!f$http?$uri) )
+                return;
+
+            if ( !hook FileExtraction::http_ignore(f$http$host, f$http$method, f$http$uri) )
                 return;
 
             if ( hook FileExtraction::http(f$http$host, f$http$method, f$http$uri) )
                 return;
+            
             Enrichment::http(f);
-
             }
 
         if ( meta$mime_type in mime_to_ext )
@@ -47,6 +51,4 @@ event file_sniff(f: fa_file, meta: fa_metadata)
         Files::add_analyzer(f, Files::ANALYZER_EXTRACT,
             [$extract_filename=fname]);
         }
-
     }
-

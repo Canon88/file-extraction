@@ -15,17 +15,24 @@ const only_method: set[string] = {
     ["GET"],
 };
 
+const ignore_url: set[string] = {
+    ["/ignore/url"],
+};
+
+hook FileExtraction::http_ignore(hostname: string, method: string, url: string) &priority = 5
+    {
+    url = split_string(url, /\?/)[0];
+    if ( [url] in ignore_url )
+        break;
+    }
+
 hook FileExtraction::http(hostname: string, method: string, url: string) &priority = 5
     {
-
     url = split_string(url, /\?/)[0];
-    
     if ( [hostname, method, url] in host_method_url )
         break;
-
     if ( [hostname, method] in host_method )
         break;
-
     if ( [method] in only_method )
         break;
     }
